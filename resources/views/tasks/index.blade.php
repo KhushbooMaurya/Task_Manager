@@ -60,7 +60,34 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <h5 class="mb-3">Tasks List</h5>
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <div class="row mb-3">
+
+                    <div class="col-md-3">
+                        <select id="statusFilter" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <input type="date" id="dateFilter" class="form-control">
+                    </div>
+
+                    <div class="col-md-3 d-flex gap-2">
+
+                        <button id="applyFilter" class="btn btn-primary">
+                            Apply Filter
+                        </button>
+
+                        <button id="resetFilter" class="btn btn-secondary">
+                            Reset
+                        </button>
+
+                    </div>
+
+                </div>
+                <div class="table-responsive">
                     <table class="table table-hover align-middle" id="taskTable">
                         <thead class="table-light">
                             <tr>
@@ -86,7 +113,7 @@
                                             {{ $task->title }}
                                         </td>
 
-                                        <td class="text-muted" style="max-width: 250px; white-space: wrap;">
+                                        <td class="text-muted" style="max-width: 250px; white-space: normal;">
                                             {{ $task->description }}
                                         </td>
 
@@ -105,7 +132,7 @@
                                         <td class="text-end">
                                             <a href="{{ route('tasks.show', $task->id) }}"
                                                 class="btn btn-sm btn-outline-info">
-                                                    View
+                                                View
                                             </a>
                                             <a href="{{ route('tasks.edit', $task->id) }}"
                                                 class="btn btn-sm btn-outline-primary">
@@ -123,9 +150,11 @@
                                     </tr>
                                 @endforeach
                             @else
-                                <div class="alert alert-info text-center">
-                                    No tasks found. Create your first task.
-                                </div>
+                                <tr>
+                                    <td colspan="6" class="text-center">
+                                        No tasks found. Create your first task.
+                                    </td>
+                                </tr>
                             @endif
                         </tbody>
 
@@ -139,7 +168,7 @@
         <div class="card border-0 shadow-sm mt-4">
             <div class="card-body">
                 <h5 class="mb-3">Uploaded Files</h5>
-                    <div class="table-responsive">
+                <div class="table-responsive">
                     <table class="table table-sm table-hover" id="uploadTable">
 
                         <thead class="table-light">
@@ -219,44 +248,48 @@
 
     <script>
         $(document).ready(function() {
+            var table = $('#taskTable').DataTable({
 
-            $('#taskTable').DataTable({
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
+
                 ordering: true,
                 searching: true,
+                responsive: true,
 
                 dom: 'Bfrtip',
 
                 buttons: [
-
-                    {
-                        extend: 'copy',
-                        text: 'Copy'
-                    },
-
-                    {
-                        extend: 'csv',
-                        text: 'CSV'
-                    },
-
-                    {
-                        extend: 'excel',
-                        text: 'Excel'
-                    },
-
-                    {
-                        extend: 'pdf',
-                        text: 'PDF'
-                    },
-
-                    {
-                        extend: 'print',
-                        text: 'Print'
-                    }
-
+                    'copy',
+                    'csv',
+                    'excel',
+                    'pdf',
+                    'print'
                 ]
             });
+
+            $('#applyFilter').click(function() {
+
+                let status = $('#statusFilter').val();
+                let date = $('#dateFilter').val();
+
+                table.column(3).search(status);
+                table.column(4).search(date);
+
+                table.draw();
+            });
+
+            $('#resetFilter').click(function() {
+
+                $('#statusFilter').val('');
+                $('#dateFilter').val('');
+
+                table.column(3).search('');
+                table.column(4).search('');
+
+                table.draw();
+            });
+
             $('#uploadTable').DataTable({
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
@@ -264,6 +297,7 @@
                 searching: true,
                 responsive: true,
             });
+
         });
     </script>
     <script>
