@@ -70,8 +70,12 @@
                         </select>
                     </div>
 
-                    <div class="col-md-3">
-                        <input type="date" id="dateFilter" class="form-control">
+                    <div class="col-md-2">
+                        <input type="date" id="fromDate" class="form-control">
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="date" id="toDate" class="form-control">
                     </div>
 
                     <div class="col-md-3 d-flex gap-2">
@@ -268,28 +272,48 @@
                 ]
             });
 
+            // CUSTOM DATE RANGE FILTER
+            $.fn.dataTable.ext.search.push(
+
+                function(settings, data, dataIndex) {
+
+                    let fromDate = $('#fromDate').val();
+                    let toDate = $('#toDate').val();
+
+                    let taskDate = data[4]; // Due Date column index
+
+                    if (!fromDate && !toDate) {
+                        return true;
+                    }
+
+                    if (fromDate && taskDate < fromDate) {
+                        return false;
+                    }
+
+                    if (toDate && taskDate > toDate) {
+                        return false;
+                    }
+
+                    return true;
+                }
+            );
             $('#applyFilter').click(function() {
 
                 let status = $('#statusFilter').val();
-                let date = $('#dateFilter').val();
 
                 table.column(3).search(status);
-                table.column(4).search(date);
 
                 table.draw();
             });
 
             $('#resetFilter').click(function() {
-
                 $('#statusFilter').val('');
-                $('#dateFilter').val('');
-
+                $('#fromDate').val('');
+                $('#toDate').val('');
                 table.column(3).search('');
-                table.column(4).search('');
-
                 table.draw();
             });
-
+            
             $('#uploadTable').DataTable({
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
